@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Prompt Engineering Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: '#00f3ff',
+                        void: '#050505',
+                        panel: '#0a0a0a',
+                        surface: '#121212',
+                        accent: '#7000ff'
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        
+        /* Mobile scroll fixes */
+        .custom-scrollbar {
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        .glow-border:focus-within {
+            box-shadow: 0 0 15px rgba(112, 0, 255, 0.3);
+            border-color: #7000ff;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 243, 255, 0.1) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100%; }
+        }
+
+        .active-tab {
+            background: rgba(112, 0, 255, 0.1);
+            border-left: 3px solid #7000ff;
+            color: #fff;
+        }
+        
+        .option-btn.selected {
+            background-color: #00f3ff;
+            color: #000;
+            border-color: #00f3ff;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .mobile-hide-text span {
+                display: none;
+            }
+            .mobile-sidebar {
+                width: 60px;
+            }
+            .mobile-terminal {
+                height: 200px !important;
+            }
+            .mobile-pb {
+                padding-bottom: 220px !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-void bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-void to-void px-4">
+        <div class="w-full max-w-md p-6 md:p-8 border border-gray-800 bg-surface/50 backdrop-blur-xl rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyber via-accent to-cyber"></div>
+            <div class="text-center mb-8">
+                <i class="fas fa-microchip text-4xl text-cyber mb-4 animate-pulse"></i>
+                <h1 class="text-2xl font-bold tracking-widest text-white font-mono">AI PROMPT LAB</h1>
+                <p class="text-xs text-gray-500 mt-2 uppercase tracking-[0.3em]">Mobile Ready v2.2</p>
+            </div>
+            <form onsubmit="handleAuth(event)" class="space-y-6">
+                <div>
+                    <div class="relative group">
+                        <input type="password" id="password-input" placeholder="CODE..." 
+                            class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-center text-white font-mono focus:border-cyber focus:outline-none transition-all glow-border">
+                        <i class="fas fa-lock absolute right-4 top-4 text-gray-600"></i>
+                    </div>
+                    <p class="text-[10px] text-gray-600 text-center mt-2 font-mono">HINT: 2026</p>
+                </div>
+                <button type="submit" class="w-full bg-white text-black hover:bg-cyber hover:scale-[1.02] py-4 text-sm font-bold uppercase tracking-widest transition-all rounded-lg shadow-lg">
+                    <span data-i18n="auth_btn">Kirish</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP INTERFACE -->
+    <div id="app-screen" class="hidden flex h-screen w-full">
+        
+        <!-- SIDEBAR (Responsive) -->
+        <aside class="mobile-sidebar w-16 md:w-64 bg-panel border-r border-gray-800 flex flex-col shrink-0 z-20 transition-all duration-300">
+            <div class="h-16 flex items-center justify-center md:justify-start md:px-6 border-b border-gray-800">
+                <i class="fas fa-cube text-cyber text-xl"></i>
+                <div class="hidden md:block ml-3">
+                    <span class="font-bold text-white tracking-wider text-sm">PROMPT LAB</span>
+                </div>
+            </div>
+
+            <nav class="flex-1 py-4 space-y-2 px-2">
+                <button onclick="switchTab('builder')" id="nav-builder" class="w-full flex items-center justify-center md:justify-start p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all active-tab">
+                    <i class="fas fa-terminal w-5 text-center"></i>
+                    <span class="hidden md:block ml-3 text-xs font-bold uppercase" data-i18n="nav_terminal">Terminal</span>
+                </button>
+                <button onclick="switchTab('tech')" id="nav-tech" class="w-full flex items-center justify-center md:justify-start p-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+                    <i class="fas fa-microchip w-5 text-center"></i>
+                    <span class="hidden md:block ml-3 text-xs font-bold uppercase" data-i18n="nav_models">Modellar</span>
+                </button>
+                <!-- Assets Tab REMOVED -->
+            </nav>
+
+            <div class="p-2 md:p-4 border-t border-gray-800">
+                <div class="flex flex-col md:flex-row items-center justify-center md:justify-between bg-black/40 p-2 rounded-lg border border-gray-700 gap-2 md:gap-0">
+                    <button onclick="setLang('uz')" class="text-[10px] md:text-xs font-bold px-2 py-1 rounded transition-colors w-full md:w-auto" id="btn-uz">UZ</button>
+                    <div class="hidden md:block w-px h-3 bg-gray-600 mx-1"></div>
+                    <button onclick="setLang('ru')" class="text-[10px] md:text-xs font-bold px-2 py-1 rounded transition-colors text-gray-500 w-full md:w-auto" id="btn-ru">RU</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col relative bg-void overflow-hidden">
+            
+            <!-- HEADER -->
+            <header class="h-16 border-b border-gray-800 flex items-center justify-between px-4 md:px-6 bg-panel/80 backdrop-blur-md z-10 shrink-0">
+                <h2 class="text-xs md:text-sm font-bold text-cyber font-mono uppercase tracking-widest truncate">
+                    <span class="text-white">//</span> <span id="page-title">SYSTEM READY</span>
+                </h2>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] text-green-400 font-mono">ONLINE</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TABS CONTENT -->
+            <div class="flex-1 overflow-hidden relative">
+                
+                <!-- 1. BUILDER TAB -->
+                <div id="tab-builder" class="h-full flex flex-col">
+                    <!-- Added extra padding bottom for mobile terminal clearance -->
+                    <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-80 mobile-pb custom-scrollbar">
+                        <div class="max-w-7xl mx-auto space-y-4 md:space-y-6">
+                            
+                            <!-- Section 1 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                                        <i class="fas fa-user text-cyber"></i> <span data-i18n="sec_subject">Obyekt</span>
+                                    </h3>
+                                    <div class="flex flex-wrap gap-2" id="list-subjects"></div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                                        <i class="fas fa-tshirt text-accent"></i> <span data-i18n="sec_garment">Kiyim</span>
+                                    </h3>
+                                    <div class="flex flex-wrap gap-2" id="list-garments"></div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2 -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_material">Mato</h3>
+                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-materials"></div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_detail">Detallar</h3>
+                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-details"></div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_style">Uslub</h3>
+                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-styles"></div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_medium">Texnika</h3>
+                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-mediums"></div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3 Selects -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_lighting">Yoritish</h3>
+                                    <div class="relative">
+                                        <select id="select-lighting" onchange="updateState('lighting', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none"></select>
+                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_camera">Rakurs</h3>
+                                    <div class="relative">
+                                        <select id="select-camera" onchange="updateState('camera', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none"></select>
+                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_env">Lokatsiya</h3>
+                                    <div class="relative">
+                                        <select id="select-env" onchange="updateState('env', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none"></select>
+                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Section 4 Settings -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-20 md:pb-32">
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_colors">Ranglar</h3>
+                                    <div class="relative">
+                                        <select id="select-colors" onchange="updateState('colors', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none"></select>
+                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_ratio">Format (AR)</h3>
+                                    <div class="flex gap-2 flex-wrap" id="btn-group-ratio"></div>
+                                </div>
+                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
+                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_version">Versiya</h3>
+                                    <div class="relative">
+                                        <select id="select-version" onchange="updateState('version', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none">
+                                            <option value="--v 6.0">Midjourney v6.0</option>
+                                            <option value="--v 5.2">Midjourney v5.2</option>
+                                            <option value="--niji 6">Niji (Anime) v6</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FIXED TERMINAL (Mobile Optimized) -->
+                    <div class="mobile-terminal absolute bottom-0 left-0 w-full bg-[#080808] border-t border-gray-800 z-30 shadow-[0_-10px_50px_rgba(0,0,0,0.9)] h-64 md:h-72 flex flex-col">
+                        <div class="w-full h-0.5 bg-gradient-to-r from-cyber via-accent to-cyber"></div>
+                        
+                        <div class="px-4 md:px-6 py-2 flex items-center justify-between bg-black/80 backdrop-blur">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-code text-cyber text-sm"></i>
+                                <span class="text-xs font-bold text-white tracking-widest uppercase">Output</span>
+                            </div>
+                            <button onclick="clearState()" class="text-[10px] text-gray-500 hover:text-red-500 uppercase font-bold transition-colors">
+                                <i class="fas fa-trash mr-1"></i> <span class="hidden md:inline">RESET</span>
+                            </button>
+                        </div>
+
+                        <div class="flex-1 flex p-2 md:p-4 gap-2 md:gap-4 overflow-hidden">
+                            <div class="flex-1 relative bg-black border border-gray-800 rounded-lg overflow-hidden group">
+                                <div class="scanline"></div>
+                                <textarea id="prompt-output" readonly 
+                                    class="w-full h-full bg-transparent p-3 md:p-4 font-mono text-xs md:text-sm text-cyber resize-none outline-none placeholder-gray-800"
+                                    placeholder="// Waiting for input..."></textarea>
+                            </div>
+                            <div class="w-32 md:w-48 flex flex-col gap-2">
+                                <button onclick="generatePrompt()" class="flex-1 bg-white hover:bg-gray-200 text-black font-bold uppercase tracking-widest text-[10px] md:text-xs rounded-lg transition-all flex flex-col items-center justify-center gap-1 md:gap-2 active:scale-95">
+                                    <i class="fas fa-bolt text-sm md:text-lg text-accent"></i>
+                                    <span data-i18n="btn_generate">Generate</span>
+                                </button>
+                                <button onclick="copyToClipboard()" id="btn-copy" class="h-10 md:h-12 bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 font-bold uppercase tracking-widest text-[9px] md:text-[10px] rounded-lg transition-all active:scale-95">
+                                    <span data-i18n="btn_copy">Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. TECH SPECS TAB -->
+                <div id="tab-tech" class="hidden h-full overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                    <div class="max-w-4xl mx-auto grid gap-6 md:gap-8 pb-20">
+                        <!-- Model 1 -->
+                        <div class="bg-surface border border-gray-800 p-6 md:p-8 rounded-xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fas fa-image text-8xl md:text-9xl"></i></div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white mb-2 font-mono">NANO BANANA <span class="text-cyber text-sm ml-2">v2.5</span></h2>
+                            <p class="text-gray-400 mb-6 text-xs md:text-sm leading-relaxed" data-i18n="desc_nano">Tasvir generatsiyasi uchun eng tezkor model.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm font-mono text-gray-300">
+                                <div class="bg-black/30 p-3 rounded border border-gray-800">Arch: Diffusion Transformer</div>
+                                <div class="bg-black/30 p-3 rounded border border-gray-800">Focus: Lighting & Texture</div>
+                            </div>
+                        </div>
+                        <!-- Model 2 -->
+                        <div class="bg-surface border border-gray-800 p-6 md:p-8 rounded-xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fas fa-video text-8xl md:text-9xl"></i></div>
+                            <h2 class="text-xl md:text-2xl font-bold text-white mb-2 font-mono">GOOGLE FLOW <span class="text-accent text-sm ml-2">Veo 3.1</span></h2>
+                            <p class="text-gray-400 mb-6 text-xs md:text-sm leading-relaxed" data-i18n="desc_flow">Video yaratish uchun mo'ljallangan kuchli dvigatel.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm font-mono text-gray-300">
+                                <div class="bg-black/30 p-3 rounded border border-gray-800">Output: 1080p @ 60s</div>
+                                <div class="bg-black/30 p-3 rounded border border-gray-800">Sim: Physics & Motion</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA TRANSLATIONS ---
+        const translations = {
+            uz: {
+                auth_btn: "Kirish",
+                nav_terminal: "Terminal",
+                nav_models: "Modellar",
+                sec_subject: "Obyekt / Model",
+                sec_garment: "Kiyim Turi",
+                sec_material: "Mato & Faktura",
+                sec_detail: "Detallar",
+                sec_style: "Uslub",
+                sec_medium: "Texnika",
+                sec_lighting: "Yoritish",
+                sec_camera: "Rakurs",
+                sec_env: "Lokatsiya",
+                sec_colors: "Rang Palitrasi",
+                sec_ratio: "Format (AR)",
+                sec_version: "Versiya",
+                btn_generate: "Yaratish",
+                btn_copy: "Nusxalash",
+                desc_nano: "Google tomonidan ishlab chiqilgan eng tezkor va aniq tasvir modeli.",
+                desc_flow: "Statik tasvirlarni jonlantirish uchun mo'ljallangan vosita.",
+                system_ready: "TIZIM TAYYOR"
+            },
+            ru: {
+                auth_btn: "Войти",
+                nav_terminal: "Терминал",
+                nav_models: "Модели",
+                sec_subject: "Объект / Модель",
+                sec_garment: "Тип Одежды",
+                sec_material: "Материал",
+                sec_detail: "Детали",
+                sec_style: "Стиль",
+                sec_medium: "Техника",
+                sec_lighting: "Освещение",
+                sec_camera: "Ракурс",
+                sec_env: "Локация",
+                sec_colors: "Палитра",
+                sec_ratio: "Формат (AR)",
+                sec_version: "Версия",
+                btn_generate: "Создать",
+                btn_copy: "Копия",
+                desc_nano: "Самая быстрая и точная модель для генерации изображений от Google.",
+                desc_flow: "Мощный инструмент для оживления статических изображений.",
+                system_ready: "СИСТЕМА ГОТОВА"
+            }
+        };
+
+        // --- DATA ASSETS ---
+        const assets = {
+            subjects: [
+                { uz: "Yevropa Modeli", ru: "Европейская Модель", val: "European High Fashion Model" },
+                { uz: "Osiyo Modeli", ru: "Азиатская Модель", val: "Asian Supermodel" },
+                { uz: "Afro Modeli", ru: "Афро Модель", val: "Black Fashion Model" },
+                { uz: "Kiborg", ru: "Киборг", val: "Cyborg Fashion Model with chrome skin" },
+                { uz: "Raqamli Avatar", ru: "Цифровой Аватар", val: "Hyper-realistic Digital Avatar" },
+                { uz: "Maneken", ru: "Манекен", val: "Headless Mannequin" },
+                { uz: "Elf Malika", ru: "Эльфийская Принцесса", val: "Ethereal Elf Princess" },
+                { uz: "Astronavt", ru: "Астронавт", val: "Futuristic Astronaut" },
+                { uz: "Kiber Samuray", ru: "Кибер Самурай", val: "Neon Cyber Samurai" },
+                { uz: "Donishmand", ru: "Старый Мудрец", val: "Wrinkled Wise Old Man" }
+            ],
+            garments: [
+                { uz: "Trench Palto", ru: "Тренч Пальто", val: "Oversized Beige Trench Coat" },
+                { uz: "Charm Kurtka", ru: "Кожаная Куртка", val: "Distressed Leather Biker Jacket" },
+                { uz: "Ipak Ko'ylak", ru: "Шелковое Платье", val: "Floor-length Silk Evening Gown" },
+                { uz: "Xudi (Hoodie)", ru: "Худи", val: "Heavyweight Streetwear Hoodie" },
+                { uz: "Korset", ru: "Корсет", val: "Structured Corset Top" },
+                { uz: "Cargo Shim", ru: "Брюки Карго", val: "Multi-pocket Cargo Pants" },
+                { uz: "Kimono", ru: "Кимоно", val: "Traditional Silk Kimono" },
+                { uz: "Skafandr", ru: "Скафандр", val: "High-tech Space Suit" },
+                { uz: "Zirh", ru: "Броня", val: "Medieval Plate Armor" }
+            ],
+            materials: [
+                { uz: "Ipak", ru: "Шелк", val: "100% Mulberry Silk" },
+                { uz: "Jinsi (Denim)", ru: "Деним", val: "Raw Japanese Denim" },
+                { uz: "Charm", ru: "Кожа", val: "Full-grain Italian Leather" },
+                { uz: "Lateks", ru: "Латекс", val: "High-shine Latex" },
+                { uz: "Baxmal", ru: "Бархат", val: "Plush Velvet" },
+                { uz: "Metallik", ru: "Металлик", val: "Liquid Metallic Fabric" },
+                { uz: "Shaffof", ru: "Прозрачный", val: "Translucent PVC" },
+                { uz: "Jun", ru: "Шерсть", val: "Coarse Wool Texture" }
+            ],
+            details: [
+                { uz: "Kashta", ru: "Вышивка", val: "Intricate Hand Embroidery" },
+                { uz: "Pufak Yenglar", ru: "Объемные Рукава", val: "Exaggerated Puffed Sleeves" },
+                { uz: "Oltin", ru: "Золото", val: "Gold Hardware Accents" },
+                { uz: "Neon", ru: "Неон", val: "Glowing Neon Trims" },
+                { uz: "Kir / Dog'lar", ru: "Грязь", val: "Dirty and Grungy Texture" },
+                { uz: "Yirtiqlar", ru: "Рваный", val: "Ripped and Torn" }
+            ],
+            styles: [
+                { uz: "Vogue", ru: "Vogue", val: "High-end Vogue Editorial" },
+                { uz: "Kiberpank", ru: "Киберпанк", val: "Futuristic Cyberpunk 2077 Aesthetic" },
+                { uz: "Minimalizm", ru: "Минимализм", val: "Minimalist Scandinavian Clean" },
+                { uz: "Kino", ru: "Кино", val: "Cinematic Movie Still (IMAX)" },
+                { uz: "Steampunk", ru: "Стимпанк", val: "Vintage Steampunk Victorian" },
+                { uz: "Retro 80s", ru: "Ретро 80-х", val: "1980s Retro Vaporwave" },
+                { uz: "Gotika", ru: "Готика", val: "Dark Gothic Atmosphere" }
+            ],
+            mediums: [
+                { uz: "Foto", ru: "Фото", val: "Photorealistic Photography" },
+                { uz: "3D Render", ru: "3D Рендер", val: "Unreal Engine 5 Render" },
+                { uz: "Yog'li Bo'yoq", ru: "Масло", val: "Oil Painting Impasto" },
+                { uz: "Akvarel", ru: "Акварель", val: "Soft Watercolor Sketch" },
+                { uz: "Anime", ru: "Аниме", val: "Anime Art Style" },
+                { uz: "Qalam", ru: "Карандаш", val: "Charcoal Sketch" },
+                { uz: "Piksel", ru: "Пиксель", val: "16-bit Pixel Art" }
+            ],
+            lighting: [
+                { uz: "Studiyo", ru: "Студия", val: "Large Softbox Studio Lighting" },
+                { uz: "Dramatik", ru: "Драматичное", val: "Rembrandt Lighting" },
+                { uz: "Neon", ru: "Неон", val: "Neon Blue and Pink Cyberpunk Lighting" },
+                { uz: "Tabiiy", ru: "Солнечный", val: "Golden Hour Sunlight" },
+                { uz: "Qorong'u", ru: "Темное", val: "Low Key Cinematic Lighting" },
+                { uz: "Tumansi", ru: "Туман", val: "Volumetric Cinematic Fog Lighting" }
+            ],
+            cameras: [
+                { uz: "Portret 85mm", ru: "Портрет 85mm", val: "85mm Portrait Lens" },
+                { uz: "Keng 24mm", ru: "Широкий 24mm", val: "Wide Angle 24mm Lens" },
+                { uz: "Makro", ru: "Макро", val: "Macro Lens" },
+                { uz: "Pastdan", ru: "Снизу", val: "Low Angle Hero Shot" },
+                { uz: "Dron", ru: "Дрон", val: "Top-down Drone Shot" },
+                { uz: "Baliq Ko'zi", ru: "Рыбий Глаз", val: "Fisheye Lens Distortion" }
+            ],
+            environments: [
+                { uz: "Oq Studiya", ru: "Белая Студия", val: "Infinity White Cyclorama Studio" },
+                { uz: "Tokio Tuni", ru: "Ночной Токио", val: "Rainy Tokyo Street at Night" },
+                { uz: "Mars", ru: "Марс", val: "Red Martian Landscape" },
+                { uz: "Abstrakt", ru: "Абстракция", val: "Abstract 3D Geometric Space" },
+                { uz: "Zavod", ru: "Завод", val: "Abandoned Industrial Warehouse" },
+                { uz: "O'rmon", ru: "Лес", val: "Dense Tropical Jungle" },
+                { uz: "Suv Osti", ru: "Под водой", val: "Underwater Deep Sea" }
+            ],
+            colors: [
+                { uz: "Neon", ru: "Неон", val: "--no cyan pink" },
+                { uz: "Oq-Qora", ru: "Ч/Б", val: "Black and white noir palette" },
+                { uz: "Pastel", ru: "Пастель", val: "Soft pastel color palette" },
+                { uz: "Oltin", ru: "Золото", val: "Black and Gold Luxury Palette" },
+                { uz: "Issiq", ru: "Теплые", val: "Warm Autumn Color Palette" }
+            ],
+            ratios: [
+                { label: "1:1", val: "--ar 1:1" },
+                { label: "16:9", val: "--ar 16:9" },
+                { label: "9:16", val: "--ar 9:16" },
+                { label: "4:5", val: "--ar 4:5" },
+                { label: "2:3", val: "--ar 2:3" }
+            ]
+        };
+
+        // --- STATE ---
+        let currentLang = 'uz';
+        let builderState = {
+            version: "--v 6.0",
+            ratio: "--ar 4:5"
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBuilder();
+            setLang('uz');
+            // Assets Index Removed
+        });
+
+        // --- AUTHENTICATION ---
+        function handleAuth(e) {
+            e.preventDefault();
+            const pass = document.getElementById('password-input').value;
+            if (pass === '2026') {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-screen').classList.remove('hidden');
+            } else {
+                const input = document.getElementById('password-input');
+                input.style.borderColor = 'red';
+                input.classList.add('animate-shake');
+                setTimeout(() => {
+                    input.style.borderColor = '#374151'; // gray-700
+                    input.classList.remove('animate-shake');
+                }, 500);
+            }
+        }
+
+        // --- LANGUAGE LOGIC ---
+        function setLang(lang) {
+            currentLang = lang;
+            
+            // UI Text Translation
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            // Update Page Title
+            document.getElementById('page-title').innerText = translations[lang].system_ready;
+
+            // Update Buttons Style
+            const btnUz = document.getElementById('btn-uz');
+            const btnRu = document.getElementById('btn-ru');
+            
+            if (lang === 'uz') {
+                btnUz.classList.add('text-white', 'bg-gray-700');
+                btnRu.classList.remove('text-white', 'bg-gray-700');
+                btnRu.classList.add('text-gray-500');
+            } else {
+                btnRu.classList.add('text-white', 'bg-gray-700');
+                btnUz.classList.remove('text-white', 'bg-gray-700');
+                btnUz.classList.add('text-gray-500');
+            }
+
+            // Re-render Lists (to update labels)
+            renderBuilder();
+        }
+
+        // --- BUILDER RENDERING ---
+        function renderBuilder() {
+            // Helper to create buttons
+            const createBtn = (item, key) => {
+                const label = item[currentLang];
+                const btn = document.createElement('button');
+                btn.className = `option-btn px-3 py-2 text-[10px] md:text-[11px] font-medium uppercase border border-gray-800 bg-surface rounded transition-all text-left text-gray-400 hover:border-gray-600 hover:text-white truncate ${builderState[key] === item.val ? 'selected' : ''}`;
+                btn.innerText = label;
+                btn.onclick = () => updateState(key, item.val);
+                return btn;
+            };
+
+            // Helper to create list items
+            const createListBtn = (item, key) => {
+                const label = item[currentLang];
+                const btn = document.createElement('button');
+                btn.className = `w-full px-3 py-2 text-[10px] md:text-[11px] border border-gray-800 rounded text-left flex justify-between items-center transition-all hover:bg-white/5 ${builderState[key] === item.val ? 'border-accent text-accent bg-accent/10' : 'text-gray-400'}`;
+                btn.innerHTML = `<span>${label}</span>${builderState[key] === item.val ? '<div class="w-1.5 h-1.5 rounded-full bg-accent"></div>' : ''}`;
+                btn.onclick = () => updateState(key, item.val);
+                return btn;
+            };
+
+            // Helper for Select options
+            const updateSelect = (id, list) => {
+                const select = document.getElementById(id);
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">...</option>';
+                list.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.val;
+                    opt.innerText = item[currentLang];
+                    select.appendChild(opt);
+                });
+                select.value = builderState[id.replace('select-', '')] || "";
+            };
+
+            // Render Grids
+            const subContainer = document.getElementById('list-subjects');
+            subContainer.innerHTML = '';
+            assets.subjects.forEach(item => subContainer.appendChild(createBtn(item, 'subject')));
+
+            const garContainer = document.getElementById('list-garments');
+            garContainer.innerHTML = '';
+            assets.garments.forEach(item => garContainer.appendChild(createBtn(item, 'garment')));
+
+            // Render Lists
+            const matContainer = document.getElementById('list-materials');
+            matContainer.innerHTML = '';
+            assets.materials.forEach(item => matContainer.appendChild(createListBtn(item, 'material')));
+
+            const detContainer = document.getElementById('list-details');
+            detContainer.innerHTML = '';
+            assets.details.forEach(item => detContainer.appendChild(createListBtn(item, 'detail')));
+
+            const styContainer = document.getElementById('list-styles');
+            styContainer.innerHTML = '';
+            assets.styles.forEach(item => styContainer.appendChild(createListBtn(item, 'style')));
+            
+            const medContainer = document.getElementById('list-mediums');
+            medContainer.innerHTML = '';
+            assets.mediums.forEach(item => medContainer.appendChild(createListBtn(item, 'medium')));
+
+            // Render Selects
+            updateSelect('select-lighting', assets.lighting);
+            updateSelect('select-camera', assets.cameras);
+            updateSelect('select-env', assets.environments);
+            updateSelect('select-colors', assets.colors);
+
+            // Render Ratio Buttons
+            const ratioContainer = document.getElementById('btn-group-ratio');
+            ratioContainer.innerHTML = '';
+            assets.ratios.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-2 text-xs border border-gray-700 rounded hover:bg-white/10 flex-grow ${builderState.ratio === item.val ? 'bg-cyber text-black border-cyber font-bold' : 'text-gray-400'}`;
+                btn.innerText = item.label;
+                btn.onclick = () => updateState('ratio', item.val);
+                ratioContainer.appendChild(btn);
+            });
+            
+            // Set Version Select
+            document.getElementById('select-version').value = builderState.version;
+        }
+
+        // --- STATE MANAGEMENT ---
+        function updateState(key, value) {
+            builderState[key] = value;
+            renderBuilder(); // Re-render to show selection visuals
+        }
+
+        function clearState() {
+            builderState = {
+                version: "--v 6.0",
+                ratio: "--ar 4:5"
+            };
+            document.getElementById('prompt-output').value = '';
+            renderBuilder();
+        }
+
+        function generatePrompt() {
+            const s = builderState;
+            // Basic construct
+            let parts = [];
+            if(s.subject) parts.push(`Subject: ${s.subject}`);
+            if(s.garment) parts.push(`Outfit: ${s.garment}`);
+            if(s.material) parts.push(`Material: ${s.material}`);
+            if(s.detail) parts.push(`Details: ${s.detail}`);
+            if(s.style) parts.push(`Style: ${s.style}`);
+            if(s.medium) parts.push(`Medium: ${s.medium}`);
+            if(s.colors) parts.push(`Palette: ${s.colors}`);
+            if(s.lighting) parts.push(`Lighting: ${s.lighting}`);
+            if(s.camera) parts.push(`Camera: ${s.camera}`);
+            if(s.env) parts.push(`Environment: ${s.env}`);
+
+            if (parts.length === 0) {
+                document.getElementById('prompt-output').value = "// Error: No parameters selected.";
+                return;
+            }
+
+            const prompt = `
+/imagine prompt: 
+${parts.join('\n')}
+${s.version} --style raw ${s.ratio} --q 2
+            `.trim();
+            
+            // Animation effect for text
+            const output = document.getElementById('prompt-output');
+            output.value = "";
+            let i = 0;
+            const speed = 5;
+            
+            function typeWriter() {
+                if (i < prompt.length) {
+                    output.value += prompt.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+            typeWriter();
+        }
+
+        function copyToClipboard() {
+            const copyText = document.getElementById("prompt-output");
+            copyText.select();
+            document.execCommand("copy");
+            
+            const btn = document.getElementById("btn-copy");
+            const originalText = btn.innerText;
+            btn.innerText = "COPIED!";
+            btn.classList.add('bg-green-600', 'border-green-600');
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-600', 'border-green-600');
+            }, 2000);
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            ['builder', 'tech'].forEach(id => {
+                document.getElementById(`tab-${id}`).classList.add('hidden');
+                document.getElementById(`nav-${id}`).classList.remove('active-tab');
+                document.getElementById(`nav-${id}`).classList.add('text-gray-400');
+            });
+
+            // Show selected
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.add('active-tab');
+            document.getElementById(`nav-${tabId}`).classList.remove('text-gray-400');
+        }
+
+    </script>
+</body>
+</html>
