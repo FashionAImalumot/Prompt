@@ -115,7 +115,7 @@
             <div class="text-center mb-8">
                 <i class="fas fa-microchip text-4xl text-cyber mb-4 animate-pulse"></i>
                 <h1 class="text-2xl font-bold tracking-widest text-white font-mono">AI PROMPT LAB</h1>
-                <p class="text-xs text-gray-500 mt-2 uppercase tracking-[0.3em]">Mobile Ready v2.3</p>
+                <p class="text-xs text-gray-500 mt-2 uppercase tracking-[0.3em]">Mobile Ready v2.4</p>
             </div>
             <form onsubmit="handleAuth(event)" class="space-y-6">
                 <div>
@@ -202,6 +202,7 @@
                                     </h3>
                                     <!-- Added scroll here due to massive list -->
                                     <div class="flex flex-wrap gap-2 max-h-80 overflow-y-auto custom-scrollbar" id="list-garments"></div>
+                                    <p class="text-[10px] text-gray-600 mt-2 text-center italic select-none" data-i18n="scroll_hint">Pastroqqa tushirish mumkin <i class="fas fa-arrow-down ml-1"></i></p>
                                 </div>
                             </div>
 
@@ -210,18 +211,22 @@
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_material">Mato</h3>
                                     <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-materials"></div>
+                                    <p class="text-[10px] text-gray-600 mt-2 text-center italic select-none" data-i18n="scroll_hint">Pastroqqa tushirish mumkin <i class="fas fa-arrow-down ml-1"></i></p>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_detail">Detallar</h3>
                                     <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-details"></div>
+                                    <p class="text-[10px] text-gray-600 mt-2 text-center italic select-none" data-i18n="scroll_hint">Pastroqqa tushirish mumkin <i class="fas fa-arrow-down ml-1"></i></p>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_style">Uslub</h3>
                                     <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-styles"></div>
+                                    <p class="text-[10px] text-gray-600 mt-2 text-center italic select-none" data-i18n="scroll_hint">Pastroqqa tushirish mumkin <i class="fas fa-arrow-down ml-1"></i></p>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_medium">Texnika</h3>
                                     <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-mediums"></div>
+                                    <p class="text-[10px] text-gray-600 mt-2 text-center italic select-none" data-i18n="scroll_hint">Pastroqqa tushirish mumkin <i class="fas fa-arrow-down ml-1"></i></p>
                                 </div>
                             </div>
 
@@ -354,7 +359,8 @@
                 btn_copy: "Nusxalash",
                 desc_nano: "Google tomonidan ishlab chiqilgan eng tezkor va aniq tasvir modeli.",
                 desc_flow: "Statik tasvirlarni jonlantirish uchun mo'ljallangan vosita.",
-                system_ready: "TIZIM TAYYOR"
+                system_ready: "TIZIM TAYYOR",
+                scroll_hint: "Pastroqqa tushirish mumkin"
             },
             ru: {
                 auth_btn: "Войти",
@@ -375,7 +381,8 @@
                 btn_copy: "Копия",
                 desc_nano: "Самая быстрая и точная модель для генерации изображений от Google.",
                 desc_flow: "Мощный инструмент для оживления статических изображений.",
-                system_ready: "СИСТЕМА ГОТОВА"
+                system_ready: "СИСТЕМА ГОТОВА",
+                scroll_hint: "Прокрутите вниз"
             }
         };
 
@@ -705,7 +712,11 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
-                    el.innerText = translations[lang][key];
+                    if (key === 'scroll_hint') {
+                        el.innerHTML = `${translations[lang][key]} <i class="fas fa-arrow-down ml-1"></i>`;
+                    } else {
+                        el.innerText = translations[lang][key];
+                    }
                 }
             });
 
@@ -736,7 +747,16 @@
             const createBtn = (item, key) => {
                 const label = item[currentLang];
                 const btn = document.createElement('button');
-                btn.className = `option-btn px-3 py-2 text-[10px] md:text-[11px] font-medium uppercase border border-gray-800 bg-surface rounded transition-all text-left text-gray-400 hover:border-gray-600 hover:text-white truncate ${builderState[key] === item.val ? 'selected' : ''}`;
+                
+                // Logic for multi-select (Garment) vs Single Select
+                let isSelected = false;
+                if (key === 'garment' && Array.isArray(builderState[key])) {
+                    isSelected = builderState[key].includes(item.val);
+                } else {
+                    isSelected = builderState[key] === item.val;
+                }
+
+                btn.className = `option-btn px-3 py-2 text-[10px] md:text-[11px] font-medium uppercase border border-gray-800 bg-surface rounded transition-all text-left text-gray-400 hover:border-gray-600 hover:text-white truncate ${isSelected ? 'selected' : ''}`;
                 btn.innerText = label;
                 btn.onclick = () => updateState(key, item.val);
                 return btn;
@@ -746,8 +766,10 @@
             const createListBtn = (item, key) => {
                 const label = item[currentLang];
                 const btn = document.createElement('button');
-                btn.className = `w-full px-3 py-2 text-[10px] md:text-[11px] border border-gray-800 rounded text-left flex justify-between items-center transition-all hover:bg-white/5 ${builderState[key] === item.val ? 'border-accent text-accent bg-accent/10' : 'text-gray-400'}`;
-                btn.innerHTML = `<span>${label}</span>${builderState[key] === item.val ? '<div class="w-1.5 h-1.5 rounded-full bg-accent"></div>' : ''}`;
+                const isSelected = builderState[key] === item.val;
+                
+                btn.className = `w-full px-3 py-2 text-[10px] md:text-[11px] border border-gray-800 rounded text-left flex justify-between items-center transition-all hover:bg-white/5 ${isSelected ? 'border-accent text-accent bg-accent/10' : 'text-gray-400'}`;
+                btn.innerHTML = `<span>${label}</span>${isSelected ? '<div class="w-1.5 h-1.5 rounded-full bg-accent"></div>' : ''}`;
                 btn.onclick = () => updateState(key, item.val);
                 return btn;
             };
@@ -808,13 +830,26 @@
                 btn.onclick = () => updateState('ratio', item.val);
                 ratioContainer.appendChild(btn);
             });
-            
-            // Version select removed
         }
 
         // --- STATE MANAGEMENT ---
         function updateState(key, value) {
-            builderState[key] = value;
+            if (key === 'garment') {
+                // Initialize if undefined
+                if (!builderState[key]) builderState[key] = [];
+                // Ensure it is an array (backward compatibility)
+                if (!Array.isArray(builderState[key])) builderState[key] = [builderState[key]].filter(Boolean);
+                
+                const idx = builderState[key].indexOf(value);
+                if (idx > -1) {
+                    builderState[key].splice(idx, 1); // Remove if exists
+                } else {
+                    builderState[key].push(value); // Add if new
+                }
+            } else {
+                // Default single select behavior
+                builderState[key] = value;
+            }
             renderBuilder(); // Re-render to show selection visuals
         }
 
@@ -831,7 +866,13 @@
             // Basic construct
             let parts = [];
             if(s.subject) parts.push(`Subject: ${s.subject}`);
-            if(s.garment) parts.push(`Outfit: ${s.garment}`);
+            
+            // Handle Multiple Garments
+            if(s.garment && s.garment.length > 0) {
+                 const garmentVal = Array.isArray(s.garment) ? s.garment.join(' + ') : s.garment;
+                 parts.push(`Outfit: ${garmentVal}`);
+            }
+
             if(s.material) parts.push(`Material: ${s.material}`);
             if(s.detail) parts.push(`Details: ${s.detail}`);
             if(s.style) parts.push(`Style: ${s.style}`);
@@ -846,7 +887,6 @@
                 return;
             }
 
-            // Version removed from prompt generation logic
             const prompt = `
 /imagine prompt: 
 ${parts.join('\n')}
