@@ -115,7 +115,7 @@
             <div class="text-center mb-8">
                 <i class="fas fa-microchip text-4xl text-cyber mb-4 animate-pulse"></i>
                 <h1 class="text-2xl font-bold tracking-widest text-white font-mono">AI PROMPT LAB</h1>
-                <p class="text-xs text-gray-500 mt-2 uppercase tracking-[0.3em]">Mobile Ready v2.2</p>
+                <p class="text-xs text-gray-500 mt-2 uppercase tracking-[0.3em]">Mobile Ready v2.3</p>
             </div>
             <form onsubmit="handleAuth(event)" class="space-y-6">
                 <div>
@@ -124,7 +124,6 @@
                             class="w-full bg-black/50 border border-gray-700 rounded-lg p-4 text-center text-white font-mono focus:border-cyber focus:outline-none transition-all glow-border">
                         <i class="fas fa-lock absolute right-4 top-4 text-gray-600"></i>
                     </div>
-                    <p class="text-[10px] text-gray-600 text-center mt-2 font-mono">HINT: 2026</p>
                 </div>
                 <button type="submit" class="w-full bg-white text-black hover:bg-cyber hover:scale-[1.02] py-4 text-sm font-bold uppercase tracking-widest transition-all rounded-lg shadow-lg">
                     <span data-i18n="auth_btn">Kirish</span>
@@ -154,7 +153,6 @@
                     <i class="fas fa-microchip w-5 text-center"></i>
                     <span class="hidden md:block ml-3 text-xs font-bold uppercase" data-i18n="nav_models">Modellar</span>
                 </button>
-                <!-- Assets Tab REMOVED -->
             </nav>
 
             <div class="p-2 md:p-4 border-t border-gray-800">
@@ -187,43 +185,43 @@
                 
                 <!-- 1. BUILDER TAB -->
                 <div id="tab-builder" class="h-full flex flex-col">
-                    <!-- Added extra padding bottom for mobile terminal clearance -->
                     <div class="flex-1 overflow-y-auto p-4 md:p-6 pb-80 mobile-pb custom-scrollbar">
                         <div class="max-w-7xl mx-auto space-y-4 md:space-y-6">
                             
-                            <!-- Section 1 -->
+                            <!-- Section 1: Subject & Garment -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
                                         <i class="fas fa-user text-cyber"></i> <span data-i18n="sec_subject">Obyekt</span>
                                     </h3>
-                                    <div class="flex flex-wrap gap-2" id="list-subjects"></div>
+                                    <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto custom-scrollbar" id="list-subjects"></div>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
                                         <i class="fas fa-tshirt text-accent"></i> <span data-i18n="sec_garment">Kiyim</span>
                                     </h3>
-                                    <div class="flex flex-wrap gap-2" id="list-garments"></div>
+                                    <!-- Added scroll here due to massive list -->
+                                    <div class="flex flex-wrap gap-2 max-h-80 overflow-y-auto custom-scrollbar" id="list-garments"></div>
                                 </div>
                             </div>
 
-                            <!-- Section 2 -->
+                            <!-- Section 2: Details & Styles -->
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_material">Mato</h3>
-                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-materials"></div>
+                                    <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-materials"></div>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_detail">Detallar</h3>
-                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-details"></div>
+                                    <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-details"></div>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_style">Uslub</h3>
-                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-styles"></div>
+                                    <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-styles"></div>
                                 </div>
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_medium">Texnika</h3>
-                                    <div class="flex flex-col gap-2 max-h-40 overflow-y-auto custom-scrollbar" id="list-mediums"></div>
+                                    <div class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scrollbar" id="list-mediums"></div>
                                 </div>
                             </div>
 
@@ -252,8 +250,8 @@
                                 </div>
                             </div>
                             
-                            <!-- Section 4 Settings -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-20 md:pb-32">
+                            <!-- Section 4 Settings (VERSION REMOVED) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20 md:pb-32">
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_colors">Ranglar</h3>
                                     <div class="relative">
@@ -264,17 +262,6 @@
                                 <div class="bg-surface border border-gray-800 rounded-lg p-4">
                                     <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_ratio">Format (AR)</h3>
                                     <div class="flex gap-2 flex-wrap" id="btn-group-ratio"></div>
-                                </div>
-                                <div class="bg-surface border border-gray-800 rounded-lg p-4">
-                                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-3" data-i18n="sec_version">Versiya</h3>
-                                    <div class="relative">
-                                        <select id="select-version" onchange="updateState('version', this.value)" class="w-full bg-black border border-gray-700 rounded p-3 text-xs text-gray-300 focus:border-cyber outline-none appearance-none">
-                                            <option value="--v 6.0">Midjourney v6.0</option>
-                                            <option value="--v 5.2">Midjourney v5.2</option>
-                                            <option value="--niji 6">Niji (Anime) v6</option>
-                                        </select>
-                                        <i class="fas fa-chevron-down absolute right-3 top-3 text-gray-500 text-xs pointer-events-none"></i>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -363,7 +350,6 @@
                 sec_env: "Lokatsiya",
                 sec_colors: "Rang Palitrasi",
                 sec_ratio: "Format (AR)",
-                sec_version: "Versiya",
                 btn_generate: "Yaratish",
                 btn_copy: "Nusxalash",
                 desc_nano: "Google tomonidan ishlab chiqilgan eng tezkor va aniq tasvir modeli.",
@@ -385,7 +371,6 @@
                 sec_env: "Локация",
                 sec_colors: "Палитра",
                 sec_ratio: "Формат (AR)",
-                sec_version: "Версия",
                 btn_generate: "Создать",
                 btn_copy: "Копия",
                 desc_nano: "Самая быстрая и точная модель для генерации изображений от Google.",
@@ -408,52 +393,237 @@
                 { uz: "Kiber Samuray", ru: "Кибер Самурай", val: "Neon Cyber Samurai" },
                 { uz: "Donishmand", ru: "Старый Мудрец", val: "Wrinkled Wise Old Man" }
             ],
+            // 100+ Garments sorted roughly by category
             garments: [
-                { uz: "Trench Palto", ru: "Тренч Пальто", val: "Oversized Beige Trench Coat" },
-                { uz: "Charm Kurtka", ru: "Кожаная Куртка", val: "Distressed Leather Biker Jacket" },
-                { uz: "Ipak Ko'ylak", ru: "Шелковое Платье", val: "Floor-length Silk Evening Gown" },
+                // Tops
+                { uz: "Futbolka (Oq)", ru: "Футболка (Белая)", val: "White Basic T-Shirt" },
+                { uz: "Futbolka (Qora)", ru: "Футболка (Черная)", val: "Black Basic T-Shirt" },
+                { uz: "Polo Ko'ylak", ru: "Поло", val: "Classic Polo Shirt" },
+                { uz: "Krop-Top", ru: "Кроп-топ", val: "Crop Top" },
+                { uz: "Mayka", ru: "Майка", val: "Tank Top" },
+                { uz: "Tunika", ru: "Туника", val: "Flowy Tunic" },
+                { uz: "Bluzka", ru: "Блузка", val: "Silk Blouse" },
+                { uz: "Ko'ylak (Ofis)", ru: "Рубашка (Офис)", val: "Crisp Button-down Shirt" },
+                { uz: "Flanel Ko'ylak", ru: "Фланелевая Рубашка", val: "Plaid Flannel Shirt" },
+                { uz: "Sviter (Katta)", ru: "Свитер (Оверсайз)", val: "Oversized Knitted Sweater" },
+                { uz: "Vodolazka", ru: "Водолазка", val: "Turtleneck Sweater" },
+                { uz: "Kardigan", ru: "Кардиган", val: "Wool Cardigan" },
                 { uz: "Xudi (Hoodie)", ru: "Худи", val: "Heavyweight Streetwear Hoodie" },
-                { uz: "Korset", ru: "Корсет", val: "Structured Corset Top" },
+                { uz: "Svitshot", ru: "Свитшот", val: "Crewneck Sweatshirt" },
+                
+                // Bottoms
+                { uz: "Jinsi (Skinny)", ru: "Джинсы (Скинни)", val: "Skinny Jeans" },
+                { uz: "Jinsi (Keng)", ru: "Джинсы (Широкие)", val: "Wide Leg Denim Jeans" },
+                { uz: "Jinsi (Yirtiq)", ru: "Джинсы (Рваные)", val: "Distressed Ripped Jeans" },
+                { uz: "Shim (Klassik)", ru: "Брюки (Классика)", val: "Tailored Trousers" },
                 { uz: "Cargo Shim", ru: "Брюки Карго", val: "Multi-pocket Cargo Pants" },
+                { uz: "Charm Shim", ru: "Кожаные Брюки", val: "Leather Pants" },
+                { uz: "Shortik", ru: "Шорты", val: "Denim Shorts" },
+                { uz: "Yubka (Mini)", ru: "Юбка (Мини)", val: "Mini Skirt" },
+                { uz: "Yubka (Midi)", ru: "Юбка (Миди)", val: "Midi Pleated Skirt" },
+                { uz: "Yubka (Maxi)", ru: "Юбка (Макси)", val: "Maxi Skirt" },
+                { uz: "Yubka (Qalam)", ru: "Юбка (Карандаш)", val: "Pencil Skirt" },
+                { uz: "Leggins", ru: "Леггинсы", val: "Athletic Leggings" },
+                
+                // Dresses & Suits
+                { uz: "Oqshom Libosi", ru: "Вечернее Платье", val: "Floor-length Evening Gown" },
+                { uz: "Kokteyl Ko'ylak", ru: "Коктейльное Платье", val: "Cocktail Dress" },
+                { uz: "Yozgi Ko'ylak", ru: "Летнее Платье", val: "Floral Sundress" },
+                { uz: "Kelin Ko'ylagi", ru: "Свадебное Платье", val: "Lace Wedding Dress" },
+                { uz: "Kombinezon", ru: "Комбинезон", val: "Jumpsuit" },
+                { uz: "Kostyum (Erkak)", ru: "Костюм (Муж)", val: "Three-piece Suit" },
+                { uz: "Kostyum (Ayol)", ru: "Костюм (Жен)", val: "Power Suit" },
+                { uz: "Smoking", ru: "Смокинг", val: "Tuxedo" },
+                
+                // Outerwear
+                { uz: "Trench Palto", ru: "Тренч", val: "Beige Trench Coat" },
+                { uz: "Charm Kurtka", ru: "Кожаная Куртка", val: "Leather Biker Jacket" },
+                { uz: "Jinsi Kurtka", ru: "Джинсовка", val: "Denim Jacket" },
+                { uz: "Bomber", ru: "Бомбер", val: "Bomber Jacket" },
+                { uz: "Puxovik", ru: "Пуховик", val: "Puffer Jacket" },
+                { uz: "Mo'yna Po'stin", ru: "Шуба", val: "Faux Fur Coat" },
+                { uz: "Yomg'irpo'sh", ru: "Дождевик", val: "Transparent Raincoat" },
+                { uz: "Peykot", ru: "Бушлат", val: "Peacoat" },
+                { uz: "Blazer", ru: "Блейзер", val: "Oversized Blazer" },
+                { uz: "Poncho", ru: "Пончо", val: "Wool Poncho" },
+                
+                // Activewear
+                { uz: "Sport Formasi", ru: "Спорт. Форма", val: "Tracksuit" },
+                { uz: "Yoga Kiyimi", ru: "Одежда для йоги", val: "Yoga Set" },
+                { uz: "Suzish Kiyimi", ru: "Купальник", val: "Swimsuit" },
+                { uz: "Velosiped Formasi", ru: "Велоформа", val: "Cycling Jersey" },
+                
+                // Lingerie & Sleep
+                { uz: "Pijama", ru: "Пижама", val: "Silk Pajamas" },
+                { uz: "Xalat", ru: "Халат", val: "Bathrobe" },
+                { uz: "Korset", ru: "Корсет", val: "Lace Corset" },
+                { uz: "Body", ru: "Боди", val: "Lace Bodysuit" },
+                
+                // Traditional & Cultural
                 { uz: "Kimono", ru: "Кимоно", val: "Traditional Silk Kimono" },
-                { uz: "Skafandr", ru: "Скафандр", val: "High-tech Space Suit" },
-                { uz: "Zirh", ru: "Броня", val: "Medieval Plate Armor" }
+                { uz: "Sari", ru: "Сари", val: "Indian Saree" },
+                { uz: "Xanbok", ru: "Ханбок", val: "Korean Hanbok" },
+                { uz: "Abaya", ru: "Абая", val: "Black Abaya" },
+                { uz: "Atlas Ko'ylak", ru: "Платье Атлас", val: "Uzbek Atlas Dress" },
+                { uz: "Chapon", ru: "Чапан", val: "Traditional Chapan" },
+                { uz: "Kilt", ru: "Килт", val: "Scottish Kilt" },
+                
+                // Fantasy & Sci-Fi
+                { uz: "Skafandr", ru: "Скафандр", val: "Sci-Fi Space Suit" },
+                { uz: "Kiber Zirh", ru: "Кибер Броня", val: "Cyberpunk Armor Suit" },
+                { uz: "Elf Libosi", ru: "Эльф. Платье", val: "Ethereal Elven Dress" },
+                { uz: "Steampunk Kostyum", ru: "Стимпанк", val: "Steampunk Inventor Suit" },
+                { uz: "Superqahramon", ru: "Супергерой", val: "Superhero Latex Suit" },
+                { uz: "Jangchi Zirhi", ru: "Броня Воина", val: "Medieval Plate Armor" },
+                { uz: "Ninja Kiyimi", ru: "Ниндзя", val: "Ninja Stealth Suit" },
+                { uz: "Sehrgar Mantiyasi", ru: "Мантия Мага", val: "Wizard Robe" },
+                
+                // Uniforms
+                { uz: "Harbiy Forma", ru: "Военная Форма", val: "Military Camouflage Uniform" },
+                { uz: "Politsiya", ru: "Полиция", val: "Police Uniform" },
+                { uz: "Shifokor Xalati", ru: "Халат Врача", val: "Doctor's White Coat" },
+                { uz: "O't o'chiruvchi", ru: "Пожарный", val: "Firefighter Gear" },
+                { uz: "Styuardessa", ru: "Стюардесса", val: "Flight Attendant Uniform" },
+                { uz: "Maktab Formasi", ru: "Школьная Форма", val: "School Uniform" },
+                { uz: "Oshpaz", ru: "Повар", val: "Chef's Uniform" },
+                
+                // Accessories (Worn)
+                { uz: "Shlyapa (Fedora)", ru: "Шляпа (Федора)", val: "Fedora Hat" },
+                { uz: "Kepka", ru: "Кепка", val: "Baseball Cap" },
+                { uz: "Sharflar", ru: "Шарф", val: "Chunky Knit Scarf" },
+                { uz: "Qo'lqop", ru: "Перчатки", val: "Leather Gloves" },
+                { uz: "Niqob", ru: "Маска", val: "Fashion Face Mask" },
+                { uz: "Ko'zoynak", ru: "Очки", val: "Sunglasses" },
+                
+                // Styles specific
+                { uz: "Boho Ko'ylak", ru: "Бохо", val: "Bohemian Maxi Dress" },
+                { uz: "Gotik Lolita", ru: "Готик Лолита", val: "Gothic Lolita Dress" },
+                { uz: "Pank Roker", ru: "Панк", val: "Punk Rock Outfit with Studs" },
+                { uz: "Hippie", ru: "Хиппи", val: "70s Hippie Outfit" },
+                { uz: "Disko", ru: "Диско", val: "80s Disco Sequined Outfit" },
+                { uz: "Kovboy", ru: "Ковбой", val: "Cowboy Outfit" },
+                { uz: "Dengizchi", ru: "Моряк", val: "Sailor Outfit" },
+                { uz: "Balerina", ru: "Балерина", val: "Ballerina Tutu" },
+                { uz: "Vampir", ru: "Вампир", val: "Vampire Costume" },
+                { uz: "Zombi", ru: "Зомби", val: "Tattered Zombie Clothes" },
+                { uz: "Robot", ru: "Робот", val: "Mechanical Robot Body" },
+                { uz: "Farishta", ru: "Ангел", val: "Angel Costume with Wings" },
+                { uz: "Iblis", ru: "Демон", val: "Demon Costume" },
+                { uz: "Qaroqchi", ru: "Пират", val: "Pirate Captain Outfit" },
+                { uz: "Fermer", ru: "Фермер", val: "Farmer Overalls" },
+                { uz: "Quruvchi", ru: "Строитель", val: "Construction Worker Vest" },
+                { uz: "Detektiv", ru: "Детектив", val: "Detective Trench Coat" },
+                { uz: "Ayg'oqchi", ru: "Шпион", val: "Spy Catsuit" },
+                { uz: "Rok Yulduzi", ru: "Рок-звезда", val: "Rockstar Leather Outfit" },
+                { uz: "Repchi", ru: "Рэпер", val: "Rapper Streetwear" },
+                { uz: "Raqqosa", ru: "Танцовщица", val: "Belly Dancer Outfit" },
+                { uz: "Geysha", ru: "Гейша", val: "Geisha Kimono" }
             ],
             materials: [
                 { uz: "Ipak", ru: "Шелк", val: "100% Mulberry Silk" },
-                { uz: "Jinsi (Denim)", ru: "Деним", val: "Raw Japanese Denim" },
+                { uz: "Jinsi", ru: "Деним", val: "Raw Japanese Denim" },
                 { uz: "Charm", ru: "Кожа", val: "Full-grain Italian Leather" },
                 { uz: "Lateks", ru: "Латекс", val: "High-shine Latex" },
                 { uz: "Baxmal", ru: "Бархат", val: "Plush Velvet" },
                 { uz: "Metallik", ru: "Металлик", val: "Liquid Metallic Fabric" },
-                { uz: "Shaffof", ru: "Прозрачный", val: "Translucent PVC" },
-                { uz: "Jun", ru: "Шерсть", val: "Coarse Wool Texture" }
+                { uz: "Shaffof Plastik", ru: "Прозрачный Пластик", val: "Translucent PVC" },
+                { uz: "Jun", ru: "Шерсть", val: "Coarse Wool Texture" },
+                { uz: "Zig'ir", ru: "Лен", val: "Natural Linen" },
+                { uz: "Paxta", ru: "Хлопок", val: "Organic Cotton" },
+                { uz: "Krujeva", ru: "Кружево", val: "Delicate Lace" },
+                { uz: "Atlas", ru: "Атлас", val: "Satin Fabric" },
+                { uz: "Fatin", ru: "Фатин", val: "Tulle Fabric" },
+                { uz: "Zamsh", ru: "Замша", val: "Suede" },
+                { uz: "Trikotaj", ru: "Трикотаж", val: "Knitted Fabric" },
+                { uz: "Neylon", ru: "Нейлон", val: "Nylon Sportswear Fabric" },
+                { uz: "Mo'yna", ru: "Мех", val: "Fluffy Fur" },
+                { uz: "Payetka", ru: "Пайетки", val: "Sequined Fabric" },
+                { uz: "Golografik", ru: "Голографик", val: "Holographic Fabric" },
+                { uz: "To'r", ru: "Сетка", val: "Mesh Fabric" }
             ],
             details: [
+                // 20+ Details
                 { uz: "Kashta", ru: "Вышивка", val: "Intricate Hand Embroidery" },
                 { uz: "Pufak Yenglar", ru: "Объемные Рукава", val: "Exaggerated Puffed Sleeves" },
                 { uz: "Oltin", ru: "Золото", val: "Gold Hardware Accents" },
                 { uz: "Neon", ru: "Неон", val: "Glowing Neon Trims" },
                 { uz: "Kir / Dog'lar", ru: "Грязь", val: "Dirty and Grungy Texture" },
-                { uz: "Yirtiqlar", ru: "Рваный", val: "Ripped and Torn" }
+                { uz: "Yirtiqlar", ru: "Рваный", val: "Ripped and Torn" },
+                { uz: "Gullar", ru: "Цветы", val: "Floral Appliques" },
+                { uz: "Jemchug", ru: "Жемчуг", val: "Pearl Embellishments" },
+                { uz: "Zanjirlar", ru: "Цепи", val: "Metal Chains" },
+                { uz: "Tikanlar", ru: "Шипы", val: "Metal Spikes" },
+                { uz: "Patlar", ru: "Перья", val: "Ostrich Feathers" },
+                { uz: "Bantlar", ru: "Банты", val: "Large Bows" },
+                { uz: "Cho'ntaklar", ru: "Карманы", val: "Oversized Pockets" },
+                { uz: "Molniya", ru: "Молния", val: "Exposed Zippers" },
+                { uz: "Kapishon", ru: "Капюшон", val: "Oversized Hood" },
+                { uz: "Belbog'", ru: "Пояс", val: "Cinched Belt" },
+                { uz: "Volanlar", ru: "Воланы", val: "Ruffles" },
+                { uz: "Yamoqlar", ru: "Заплатки", val: "Patched Fabric" },
+                { uz: "Qon", ru: "Кровь", val: "Blood Stains" },
+                { uz: "Suv Tomchilari", ru: "Капли Воды", val: "Wet Water Drops" },
+                { uz: "Yoniq", ru: "Горящий", val: "Burning Edges" },
+                { uz: "Muzlagan", ru: "Замерзший", val: "Frozen Frosted Details" },
+                { uz: "Yaltiroq", ru: "Блестки", val: "Glitter Dust" },
+                { uz: "Logolar", ru: "Логотипы", val: "Brand Logos" },
+                { uz: "Tatuirovka", ru: "Тату", val: "Visible Tattoos" }
             ],
             styles: [
+                // 20+ Styles
                 { uz: "Vogue", ru: "Vogue", val: "High-end Vogue Editorial" },
                 { uz: "Kiberpank", ru: "Киберпанк", val: "Futuristic Cyberpunk 2077 Aesthetic" },
                 { uz: "Minimalizm", ru: "Минимализм", val: "Minimalist Scandinavian Clean" },
                 { uz: "Kino", ru: "Кино", val: "Cinematic Movie Still (IMAX)" },
                 { uz: "Steampunk", ru: "Стимпанк", val: "Vintage Steampunk Victorian" },
                 { uz: "Retro 80s", ru: "Ретро 80-х", val: "1980s Retro Vaporwave" },
-                { uz: "Gotika", ru: "Готика", val: "Dark Gothic Atmosphere" }
+                { uz: "Gotika", ru: "Готика", val: "Dark Gothic Atmosphere" },
+                { uz: "Barokko", ru: "Барокко", val: "Ornate Baroque Style" },
+                { uz: "Renessans", ru: "Ренессанс", val: "Renaissance Painting Style" },
+                { uz: "Art Deco", ru: "Арт Деко", val: "Art Deco Geometric" },
+                { uz: "Streetwear", ru: "Уличный", val: "Hypebeast Streetwear" },
+                { uz: "Avant-garde", ru: "Авангард", val: "Avant-garde Fashion" },
+                { uz: "Grunge", ru: "Гранж", val: "90s Grunge Aesthetic" },
+                { uz: "Y2K", ru: "Y2K", val: "2000s Y2K Aesthetic" },
+                { uz: "Fantasy", ru: "Фэнтези", val: "High Fantasy Art" },
+                { uz: "Horror", ru: "Хоррор", val: "Dark Horror Atmosphere" },
+                { uz: "Noir", ru: "Нуар", val: "Film Noir Style" },
+                { uz: "Pop Art", ru: "Поп-арт", val: "Pop Art Andy Warhol" },
+                { uz: "Surrealizm", ru: "Сюрреализм", val: "Surrealist Dreamscape" },
+                { uz: "Kubizm", ru: "Кубизм", val: "Cubism Picasso Style" },
+                { uz: "Ukiyoe", ru: "Укиё-э", val: "Japanese Ukiyo-e Style" },
+                { uz: "Graffiti", ru: "Граффити", val: "Street Graffiti Art" },
+                { uz: "Pastel Goth", ru: "Пастель Гот", val: "Pastel Goth Aesthetic" },
+                { uz: "Cottagecore", ru: "Коттеджкор", val: "Rustic Cottagecore" },
+                { uz: "Dark Academia", ru: "Дарк Академия", val: "Dark Academia Aesthetic" }
             ],
             mediums: [
+                // 20+ Mediums
                 { uz: "Foto", ru: "Фото", val: "Photorealistic Photography" },
                 { uz: "3D Render", ru: "3D Рендер", val: "Unreal Engine 5 Render" },
                 { uz: "Yog'li Bo'yoq", ru: "Масло", val: "Oil Painting Impasto" },
                 { uz: "Akvarel", ru: "Акварель", val: "Soft Watercolor Sketch" },
                 { uz: "Anime", ru: "Аниме", val: "Anime Art Style" },
                 { uz: "Qalam", ru: "Карандаш", val: "Charcoal Sketch" },
-                { uz: "Piksel", ru: "Пиксель", val: "16-bit Pixel Art" }
+                { uz: "Piksel", ru: "Пиксель", val: "16-bit Pixel Art" },
+                { uz: "Siyoh", ru: "Чернила", val: "Ink Illustration" },
+                { uz: "Marmar", ru: "Мрамор", val: "Marble Sculpture" },
+                { uz: "Loy", ru: "Глина", val: "Claymation Style" },
+                { uz: "Origami", ru: "Оригами", val: "Paper Origami Art" },
+                { uz: "Mozaika", ru: "Мозаика", val: "Tile Mosaic Art" },
+                { uz: "Vitraj", ru: "Витраж", val: "Stained Glass Art" },
+                { uz: "Neon Chiroq", ru: "Неон", val: "Neon Light Sculpture" },
+                { uz: "Polaroid", ru: "Полароид", val: "Vintage Polaroid Photo" },
+                { uz: "VHS", ru: "VHS", val: "Glitchy VHS Tape" },
+                { uz: "GoPro", ru: "GoPro", val: "GoPro Action Shot" },
+                { uz: "Termal", ru: "Тепловизор", val: "Thermal Camera View" },
+                { uz: "Rentgen", ru: "Рентген", val: "X-Ray Vision" },
+                { uz: "LEGO", ru: "ЛЕГО", val: "LEGO Brick Art" },
+                { uz: "Ip", ru: "Нитки", val: "Yarn Crochet Art" },
+                { uz: "Tattoo Art", ru: "Тату Арт", val: "Tattoo Design Flash" },
+                { uz: "Chalk", ru: "Мел", val: "Chalkboard Art" },
+                { uz: "Sand Art", ru: "Песок", val: "Sand Art" },
+                { uz: "Smoke", ru: "Дым", val: "Colored Smoke Art" }
             ],
             lighting: [
                 { uz: "Studiyo", ru: "Студия", val: "Large Softbox Studio Lighting" },
@@ -499,7 +669,6 @@
         // --- STATE ---
         let currentLang = 'uz';
         let builderState = {
-            version: "--v 6.0",
             ratio: "--ar 4:5"
         };
 
@@ -640,8 +809,7 @@
                 ratioContainer.appendChild(btn);
             });
             
-            // Set Version Select
-            document.getElementById('select-version').value = builderState.version;
+            // Version select removed
         }
 
         // --- STATE MANAGEMENT ---
@@ -652,7 +820,6 @@
 
         function clearState() {
             builderState = {
-                version: "--v 6.0",
                 ratio: "--ar 4:5"
             };
             document.getElementById('prompt-output').value = '';
@@ -679,10 +846,11 @@
                 return;
             }
 
+            // Version removed from prompt generation logic
             const prompt = `
 /imagine prompt: 
 ${parts.join('\n')}
-${s.version} --style raw ${s.ratio} --q 2
+--style raw ${s.ratio} --q 2
             `.trim();
             
             // Animation effect for text
